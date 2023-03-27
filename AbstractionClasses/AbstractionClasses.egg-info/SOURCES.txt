@@ -1,0 +1,5 @@
+setup.py
+AbstractionClasses.egg-info/PKG-INFO
+AbstractionClasses.egg-info/SOURCES.txt
+AbstractionClasses.egg-info/dependency_links.txt
+AbstractionClasses.egg-info/top_level.txt
