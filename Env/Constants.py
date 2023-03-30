@@ -1,0 +1,1 @@
+DATA_SCIENCE_JOBS= ["Data Scientist","Data Engineer","Data Analyst","Data Architect","BI Analyst","Business Analyst","Statistician"]
