@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-from AbstractionClasses.PreProcessor import PreProcessor
+from AbstractionClasses.Preprocessing.PreProcessor import PreProcessor
 from DuplicationHandler import DuplicationHandler
 
 class Concatenator(PreProcessor):
