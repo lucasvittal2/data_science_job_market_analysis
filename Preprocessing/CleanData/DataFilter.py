@@ -56,6 +56,31 @@ class DataFilter(DataCleaner):
                                        try to impleement one of following available methods : 'FILTER_OUTLIERS_BY_Z_SCORE' or 'FILTER_OUTLIERS_BY_IQR' ")
         return filtered_data
          
+         
+    def __filter_by_freq(self, data:  DataFrame):
+        
+        col = self.col
+        by_value = self.by_value
+        filter_by = self.filter_by
+        tmp_df = data.copy()
+        
+        value_counts = DataFrame(tmp_df[col].value_counts()).reset_index()
+        value_counts.columns = ['title', 'freq']
+        
+          
+        options ={
+            "FREQ_GREATER_THAN_VALUE" : value_counts[ value_counts['freq'] >  by_value]['title'],
+            "FREQ_GREATER_OR_EQUAL_THAN_VALUE" :    value_counts[ value_counts['freq'] >=  by_value]['title'],
+            "FREQ_EQUAL_VALUE" :  value_counts[ value_counts['freq'] ==  by_value]['title'],
+            "FREQ_LOWER_THAN_VALUE" : value_counts[ value_counts['freq'] <  by_value]['title'],
+            "FREQ_LOWER_OR_EQUAL_THAN_VALUE" : value_counts[ value_counts['freq'] <=  by_value]['title']
+        }
+        to_remove = options[filter_by]
+        tmp_df = tmp_df[  ~tmp_df[col].isin(to_remove)  ]
+        
+        
+        return tmp_df
+        
     def __filter_by_value(self,data : DataFrame):
         col = self.col
         value= self.by_value
@@ -68,22 +93,22 @@ class DataFilter(DataCleaner):
         
         
         if self.filter_by == "FILTER_NOT_EQUAL_VALUE":
-            filtered_data =  tmp_data[ tmp_data[col] !=  value ]
+            filtered_data =  tmp_data[ tmp_data[col] ==  value ]
         
         elif self.filter_by == "FILTER_EQUAL_VALUE":
-            filtered_data =  tmp_data[ tmp_data[col] ==  value ]
+            filtered_data =  tmp_data[ tmp_data[col] !=  value ]
             
         elif self.filter_by == "FILTER_GREATER_THAN_VALUE":
-            filtered_data =  tmp_data[ tmp_data[col] >  value ]
+            filtered_data =  tmp_data[ tmp_data[col] <  value ]
             
         elif self.filter_by == "FILTER_GREATER_OR_EQUAL_THAN_VALUE":
-            filtered_data =  tmp_data[ tmp_data[col] >=  value ]
+            filtered_data =  tmp_data[ tmp_data[col] <=  value ]
             
         elif self.filter_by == "FILTER_LOWER_THAN_VALUE":
-                filtered_data =  tmp_data[ tmp_data[col] <  value ]
+                filtered_data =  tmp_data[ tmp_data[col] >  value ]
             
         elif self.filter_by == "FILTER_LOWER_OR_EQUAL_THAN_VALUE":
-            filtered_data =  tmp_data[ tmp_data[col] <=  value ]
+            filtered_data =  tmp_data[ tmp_data[col] >=  value ]
         else:
             print("ERROR NOT IMPLEMENTED!")
             raise NotImplementedError("Value Filtration Method not implemented!\n \
@@ -96,6 +121,9 @@ class DataFilter(DataCleaner):
         print("Performing Data Filtering... ")
         if "FILTER_OUTLIERS" in self.filter_by:
             filtered_data = self.__eliminate_outliers(data)
+            
+        elif "FREQ" in self.filter_by:
+            filtered_data = self.__filter_by_freq(data)
             
         elif  self.filter_by in ["FILTER_NOT_EQUAL_VALUE", "FILTER_EQUAL_VALUE", "FILTER_GREATER_THAN_VALUE","FILTER_GREATER_OR_EQUAL_THAN_VALUE","FILTER_LOWER_THAN_VALUE", "FILTER_LOWER_OR_EQUAL_THAN_VALUE"]:
             

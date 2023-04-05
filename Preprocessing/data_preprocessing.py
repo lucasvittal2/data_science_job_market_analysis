@@ -88,17 +88,115 @@ filtering_unknown_state  = DataFilter(filter_by="FILTER_NOT_EQUAL_VALUE", by_val
 
 print("Iniciating Pre-Processing on H1BdataDB\n")
 
-pre_preprocessors = [ 
+h1bdata_pre_preprocessors = [ 
                      blank_lines_cleaner, comma_replacer, convert_salaries_to_float,filter_ds_jobs,\
                     covert_date_to_datetime, get_out_outliers_IQR, \
                     splitt_location_column, map_replace_states,filtering_unknown_state
     ]
 
-preprocessing = PreProcessing( pre_processors= pre_preprocessors)
-data = pd.read_csv(DATASET_PATH + 'H1bdata_Salaries_EUA/USA_data_science_jobs_h1bdata.csv')
-h1bdata_preprocessed =  preprocessing.process_data(data)
+preprocessing = PreProcessing( pre_processors= h1bdata_pre_preprocessors)
+h1bdata_df = pd.read_csv(DATASET_PATH + 'H1bdata_Salaries_EUA/USA_data_science_jobs_h1bdata.csv')
+h1bdata_preprocessed =  preprocessing.process_data(h1bdata_df)
 
 
 print("H1BdataDB Preprocessing Completed Sucessfully.")
+"""
 
-h1bdata_preprocessed.to_csv(TEST_PATH + "H1BDATA_preprocessed_data.csv")
+"""#Simplifying job roles on kaggle dataset
+
+map = dict(pd.read_csv(DATASET_PATH + "Jobs_descriptions_EUA/job_role_mapping/mapa_job_roles_kaggle.csv" , delimiter=';')[['Original','Simplyfied']].values)
+map = {k.upper(): v.upper() for k,v in  map.items()}
+
+
+simplify_job_role_on_glassdorr_db = DataReplacer(task="MAPREPLACING", on_col="title", map=map)
+
+
+# Eliminate useless titles
+
+useless_title_eliminator = DataFilter(filter_by="FREQ_LOWER_THAN_VALUE", col='title', by_value= 2)
+
+
+#preprocessing kaggle dataset
+
+print("Iniciating Pre-Processing on job_description_kaggle\n")
+job_description_kaggle_df = pd.read_csv(DATASET_PATH + 'Jobs_descriptions_EUA/2023-data-scientists-jobs-descriptions.csv')
+job_description_kaggle_preprocessors = [ simplify_job_role_on_glassdorr_db, useless_title_eliminator ]
+job_description_kaggle_preprocessing =  PreProcessing( pre_processors= job_description_kaggle_preprocessors)
+job_description_kaggle_preprocessed =  job_description_kaggle_preprocessing.process_data(job_description_kaggle_df)
+print("job_description_kaggle Preprocessing Completed Sucessfully.")
+
+
+# Replace if contains
+jobs =  ["DATA SCIENTIST","DATA ENGINEER","DATA ANALYST","DATA ARCHITECT","BI ANALYST","BUSINESS ANALYST","STATISTICIAN", "DATA ANALYTICS","DATA SPECIALIST", "DATA SCIENCE","DATA ANALYSIS","ANALYST", "ANALYTICS","DATA MANAGEMENT SPECIALIST","BUSINESS ANALYSIS", "MACHINE LEARNING ENGINEER", "RESEARCH","SOFTWARE ENGINEER","MACHINE LEARNING SCIENTIST","ASSOCIATE SCIENTIST", "DATA MODELER"]
+glassdoor_job_replace_if_contains = DataReplacer(task="IFCONTAINSREPLACNING", on_col= 'Job Title', values= jobs)
+
+
+#Simplifying titles on glassdoor database
+map = {
+    "BUSINESS ANALYSIS": "DATA ANALYST",
+     "DATA ANALYTICS": "DATA ANALYST",
+     "DATA ANALYSIS": "DATA ANALYST",
+     "DATA SCIENCE" : "DATA SCIENTIST",
+     "ANALYST": "DATA ANALYST",
+     "DATA MANAGEMENT SPECIALIST": "DATA SPECIALIST",
+     "ANALYTICS":"DATA ANALYST",
+     "RESEARCH": "RESEARCHER",
+     "MACHINE LEARNING SCIENTIST": "RESEARCHER",
+     "DATA ENGINEER I": "DATA ENGINEER",
+     "DATA ENGINEER II": "DATA ENGINEER",
+     "DATA ENGINEER III": "DATA ENGINEER",
+     "DATA ANALYST I":"DATA ANALYST",
+     "DATA ANALYST II":"DATA ANALYST",
+     "DATA ANALYST III":"DATA ANALYST",
+     "DATA ANALYST JUNIOR":"DATA ANALYST",
+     "DATA ARCHITECT II": "DATA ARCHITECT",
+     "DATA ARCHITECT I": "DATA ARCHITECT",
+     "DATA ARCHITECT III": "DATA ARCHITECT",
+     "MARKETING DATA ANALYST": "DATA ANALYST",
+     "DATA ENGINEER (REMOTE)": "DATA ENGINEER",
+     "CLOUD DATA ENGINEER": "DATA ENGINEER",
+     "SR. DATA ENGINEER": "DATA ENGINEER",
+     "BUSINESS DATA ANALYST	": "DATA ANALYST",
+     "SR. DATA ANALYST": "DATA ANALYST",
+     "SENIOR MACHINE LEARNING ENGINEER": "MACHINE LEARNING ENGINEER",
+     "DATA SCIENTIST (REMOTE)": "DATA SCIENTIST",
+     "DATA SCIENTIST I": "DATA SCIENTIST",
+     "DATA SCIENTIST II": "DATA SCIENTIST",
+     "DATA SCIENTIST III": "DATA SCIENTIST",
+     "AWS DATA ENGINEER":"DATA ENGINEER",
+     "AZURE DATA ENGINEER":"DATA ENGINEER",
+     "DATA SCIENCE ENGINEER":"DATA SCIENTIST",
+     "MACHINE LEARNING ENGINEER (IMAGING)": "MACHINE LEARNING ENGINEER",
+     "MACHINE LEARNING SCIENTIST":"RESEARCHER"
+
+}
+
+
+glassdoor_job_title_simplifier = DataReplacer(task='MAPREPLACING', on_col = 'Job Title', map=map)
+
+
+#eliminate unfrequent values
+
+glassdoor_unfrequent_title_elimination = DataFilter(filter_by = "FREQ_LOWER_THAN_VALUE", col='Job Title', by_value= 108)
+
+
+
+
+#glassdoor preprocessing
+print("Iniciating Pre-Processing on job_description_kaggle\n")
+job_description_glassdoor_df = pd.read_csv(DATASET_PATH + "Jobs_descriptions_EUA/DataScientist_glassdoor.csv")
+job_description_glassdoor_preprocessors = [ glassdoor_job_replace_if_contains, glassdoor_job_title_simplifier, glassdoor_unfrequent_title_elimination ]
+job_description_kaggle_preprocessing =  PreProcessing( pre_processors= job_description_glassdoor_preprocessors)
+job_description_kaggle_preprocessed =  job_description_kaggle_preprocessing.process_data(job_description_glassdoor_df)
+print("job_description_kaggle Preprocessing Completed Sucessfully.")
+
+
+
+#save files
+print("Saving Files on test folder...")
+#h1bdata_preprocessed.to_csv(TEST_PATH + "H1BDATA_preprocessed_data.csv")
+job_description_kaggle_preprocessed.replace(-1, 'unknown', inplace=True)
+job_description_kaggle_preprocessed.replace('-1', 'unknown', inplace=True)
+job_description_kaggle_preprocessed.to_csv(TEST_PATH + "job_description_glassdoor_preprocessed.csv")
+print("Files Saved !")
+
