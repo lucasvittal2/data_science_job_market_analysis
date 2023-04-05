@@ -1,1 +1,3 @@
 DATASET_PATH = "../../Dataset/"
+DEPLOYMENT_PATH = 'C:/Users/lucas/Documents/Studying/Pos-graduacao - Ciencia de Dados e  Analytics/Sprints/sprint I - Analise de salarios cientista de dados/data_science_job_market_analysis/Code'
+TEST_PATH = "C:/Users/lucas/Documents/Studying/Pos-graduacao - Ciencia de Dados e  Analytics/Sprints/sprint I - Analise de salarios cientista de dados/data_science_job_market_analysis/Dataset/Output_analyse/"

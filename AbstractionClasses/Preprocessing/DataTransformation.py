@@ -1,5 +1,5 @@
 from abc import abstractclassmethod
-from PreProcessor import PreProcessor
+from  AbstractionClasses.Preprocessing.PreProcessor import PreProcessor
 
 class DataTransformation(PreProcessor):
     

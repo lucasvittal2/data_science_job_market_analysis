@@ -23,6 +23,8 @@ class DataRefactor(DataTransformation):
     
     def transform_data(self, data):
         
+        print(" Performing Data Refactoring... ")
+        
         if self.task == "DISCRETIZING":
             transformed_data = self.__discretize_data(data)
             
@@ -34,5 +36,8 @@ class DataRefactor(DataTransformation):
         else:
             raise NotImplementedError("Data refactor not available! \n \
                 try to impleement one of following available methods :'DISCRETIZING', 'ENCODING', 'AGGREGATING'")
-        
+        print("Data Refactoring DONE ! \n")
         return transformed_data
+    
+    def process_data(self, data):
+         return self.transform_data(data)

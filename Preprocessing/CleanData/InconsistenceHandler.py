@@ -15,6 +15,8 @@ class InconsistenceHandler(DataCleaner):
     
     def clean_data(self, data):
         
+        print("Perform inconsistences elimination... ")
+        
         if "INCONSISTENCE" in self.eliminate_by:
             cleaned_data=  self.eliminate_inconsistences(data)
         elif "REDUNDANCES" in self.eliminate_by:
@@ -22,4 +24,9 @@ class InconsistenceHandler(DataCleaner):
         else:
             raise NotImplementedError("Inconsistence Handling method not implemented! \n \
                 try some of available methods: 'INCONSISTENCE_...', 'REDUNDANCES_...' ")
+            
+        print("Inconsistences elimination DONE !\n ")
         return  cleaned_data
+    
+    def process_data(self, data):
+         return self.clean_data(data)

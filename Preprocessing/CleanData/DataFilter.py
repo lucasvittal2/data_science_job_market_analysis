@@ -1,24 +1,50 @@
 from AbstractionClasses.Preprocessing.DataCleaner import DataCleaner
+from pandas import DataFrame
+from scipy import stats
+import numpy as np
 
 class DataFilter(DataCleaner):
     
-    by_value: any = None
     
-    def __init__(self, filter_by, col, by_value):
-        self.filter_by = filter_by
+    
+    def __init__(self, filter_by: str, col: str, by_value=None):
+        self.by_value = by_value
         self.col = col
+        self.filter_by = filter_by
     
     
-    def __filter_data_by_z_score(self, data):
-        Z_THRESHOLD = 3
-        #filter by z-score
-        pass
+    def __filter_data_by_z_score(self, data: DataFrame):
+        Z_THRESHOLD = 3 ## holds 99.78% of data regarding a normal distribution.
+        col = self.col
+        tmp_df = data.copy()
+        z_score = np.abs( stats.zscore( tmp_df[col] ) )
+        outlier_free = tmp_df[ (z_score.lt(Z_THRESHOLD) )]
+        return outlier_free
     
-    def __filter_data_by_IQR(self, data):
+    def __filter_data_by_value_list(self, data: DataFrame):
+        
+        col = self.col
+        values = self.by_value
+        filtered_data = data[ data[col].isin(values)]
+        return  filtered_data
+        
+    
+    def __filter_data_by_IQR(self, data: DataFrame):
         #filter by IRQ
-        pass
+        
+        tmp_df = data.copy()
+        
+        Q1 = tmp_df.quantile(0.25)
+        Q3 = tmp_df.quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5*IQR
+        upper_bound = Q3 + 1.5*IQR
+        
+        outlier_free = tmp_df[~( ( tmp_df.lt( lower_bound ) ) |( tmp_df.gt( upper_bound ) ) ).any(axis=1) ]
+        
+        return outlier_free
     
-    def __eliminate_outliers(self,data):
+    def __eliminate_outliers(self, data: DataFrame):
         
         if self.filter_by == "FILTER_OUTLIERS_BY_Z_SCORE":
             filtered_data = self.__filter_data_by_z_score(data)
@@ -30,40 +56,56 @@ class DataFilter(DataCleaner):
                                        try to impleement one of following available methods : 'FILTER_OUTLIERS_BY_Z_SCORE' or 'FILTER_OUTLIERS_BY_IQR' ")
         return filtered_data
          
-    def __filter_by_value(self,data):
+    def __filter_by_value(self,data : DataFrame):
         col = self.col
         value= self.by_value
         
-        if value == None:
-            raise ValueError("Value used in filtration not Defined! Define some value !")
-        if self.filter_by == "FILTER_NOT_EQUAL_VALUE":
-            filtered_data =  data[data[col] !=  value ]
+        tmp_data = data.copy()
+        tmp_data[col] = tmp_data[col].str.strip()
         
-        if self.filter_by == "FILTER_EQUAL_VALUE":
-            filtered_data =  data[data[col] ==  value ]
+        if value == None and "FILTER_OUTLIERS" not in self.filter_by:
+            raise ValueError("Value used in filtration not Defined! Define some value !")
+        
+        
+        if self.filter_by == "FILTER_NOT_EQUAL_VALUE":
+            filtered_data =  tmp_data[ tmp_data[col] !=  value ]
+        
+        elif self.filter_by == "FILTER_EQUAL_VALUE":
+            filtered_data =  tmp_data[ tmp_data[col] ==  value ]
             
         elif self.filter_by == "FILTER_GREATER_THAN_VALUE":
-            filtered_data =  data[data[col] >  value ]
+            filtered_data =  tmp_data[ tmp_data[col] >  value ]
             
         elif self.filter_by == "FILTER_GREATER_OR_EQUAL_THAN_VALUE":
-            filtered_data =  data[data[col] >=  value ]
+            filtered_data =  tmp_data[ tmp_data[col] >=  value ]
             
         elif self.filter_by == "FILTER_LOWER_THAN_VALUE":
-                filtered_data =  data[data[col] <  value ]
+                filtered_data =  tmp_data[ tmp_data[col] <  value ]
             
         elif self.filter_by == "FILTER_LOWER_OR_EQUAL_THAN_VALUE":
-            filtered_data =  data[data[col] <=  value ]
-        
+            filtered_data =  tmp_data[ tmp_data[col] <=  value ]
         else:
+            print("ERROR NOT IMPLEMENTED!")
             raise NotImplementedError("Value Filtration Method not implemented!\n \
                 try the available methods : 'FILTER_NOT_EQUAL_VALUE', 'FILTER_EQUAL_VALUE' ,'FILTER_GREATER_THAN_VALUE', 'FILTER_GREATER_OR_EQUAL_THAN_VALUE', 'FILTER_LOWER_THAN_VALUE', 'FILTER_LOWER_OR_EQUAL_THAN_VALUE' ")
+
         
         return filtered_data
     def clean_data(self, data):
         
+        print("Performing Data Filtering... ")
         if "FILTER_OUTLIERS" in self.filter_by:
             filtered_data = self.__eliminate_outliers(data)
-        else:
+            
+        elif  self.filter_by in ["FILTER_NOT_EQUAL_VALUE", "FILTER_EQUAL_VALUE", "FILTER_GREATER_THAN_VALUE","FILTER_GREATER_OR_EQUAL_THAN_VALUE","FILTER_LOWER_THAN_VALUE", "FILTER_LOWER_OR_EQUAL_THAN_VALUE"]:
+            
             filtered_data = self.__filter_by_value(data)
+        elif self.filter_by == "FILTER_BY_VALUES":
+            filtered_data = self.__filter_data_by_value_list(data)
+        
+        print("Data Filtering DONE ! \n")    
             
         return filtered_data
+
+    def process_data(self, data):
+         return self.clean_data(data)
