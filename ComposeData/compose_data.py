@@ -5,16 +5,16 @@ sys.path.append("../")
 from CsvReader import CsvReader
 from Concatenator import Concatenator
 from Env.ProjectPaths import DATASET_PATH
-import tkinter as tk
+
 
 #Instantiate Classes
 
 #Readers
 
-csv_reader1 = CsvReader(file_path= DATASET_PATH + "Salaries_around_world/", file_name="data_science jobs_salaries_world.csv")
-csv_reader2 = CsvReader(file_path= DATASET_PATH + "Salaries_around_world/", file_name="data_science_salaries_around_world.csv")
-csv_reader3 = CsvReader(file_path= DATASET_PATH + "Salaries_around_world/", file_name="ds.salaries.csv")
-csv_reader4 = CsvReader(file_path= DATASET_PATH + "Salaries_around_world/", file_name="salaries.csv")
+csv_reader1 = CsvReader(file_path= DATASET_PATH + "Salaries_around_world/data_science jobs_salaries_world.csv")
+csv_reader2 = CsvReader(file_path= DATASET_PATH + "Salaries_around_world/data_science_salaries_around_world.csv")
+csv_reader3 = CsvReader(file_path= DATASET_PATH + "Salaries_around_world/ds.salaries.csv")
+csv_reader4 = CsvReader(file_path= DATASET_PATH + "Salaries_around_world/salaries.csv")
 
 #Concatenator
 

@@ -3,7 +3,7 @@ import numpy as np
 
 
 from AbstractionClasses.Preprocessing.PreProcessor import PreProcessor
-from DuplicationHandler import DuplicationHandler
+from ComposeData.DuplicationHandler import DuplicationHandler
 
 class Concatenator(PreProcessor):
     

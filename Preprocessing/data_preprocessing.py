@@ -29,27 +29,27 @@ import pandas as pd
 print("Instantiating Preprocessor...\n")
 
 
-blank_lines_cleaner = MissingDataHandler(handling_by = "CLEAN_BLANK_LINES")
+h1_bdata_blank_lines_cleaner = MissingDataHandler(handling_by = "CLEAN_BLANK_LINES")
 
 #tretement on salaries
-comma_replacer = DataReplacer(task = "CHARREPLACING", on_col = "salary", this = ",", by = "")
-convert_salaries_to_float = DataTypeConversor(to_type='TO_FLOAT', col='salary')
+h1_bdata_comma_replacer = DataReplacer(task = "CHARREPLACING", on_col = "salary", this = ",", by = "")
+h1_bdata_convert_salaries_to_float = DataTypeConversor(to_type='TO_FLOAT', col='salary')
 
 #Filter the interesting jobs
 
-filter_ds_jobs = DataFilter(filter_by="FILTER_BY_VALUES", col='title', by_value = DS_JOBS)
+h1_bdata_filter_ds_jobs = DataFilter(filter_by="FILTER_BY_VALUES", col='title', by_value = DS_JOBS)
 
 #Tretment on date
-covert_date_to_datetime = DataTypeConversor(to_type='TO_DATETIME', col = 'date',actual_date_format="%m/%d/%Y", to_date_format = "%d/%m/%Y")
+h1_bdata_covert_date_to_datetime = DataTypeConversor(to_type='TO_DATETIME', col = 'date',actual_date_format="%m/%d/%Y", to_date_format = "%d/%m/%Y")
 
 
 
 
 #get out outliers by IRQ
-get_out_outliers_IQR =   DataFilter(filter_by = "FILTER_OUTLIERS_BY_IQR",col ='salary')
+h1_bdata_get_out_outliers_IQR =   DataFilter(filter_by = "FILTER_OUTLIERS_BY_IQR",col ='salary')
 
 # Spliting  location column on city and state column
-splitt_location_column = DataSplitter(delimiter = ',' , old_col = 'location', new_col1='city', new_col2='state')
+h1_bdata_splitt_location_column = DataSplitter(delimiter = ',' , old_col = 'location', new_col1='city', new_col2='state')
 
 #map Replace
 map = {
@@ -82,16 +82,16 @@ map_replace_states = DataReplacer(task="MAPREPLACING", on_col='state', map = map
 
 #filtering unknow states 
 
-filtering_unknown_state  = DataFilter(filter_by="FILTER_NOT_EQUAL_VALUE", by_value='unknown', col='state')
+filtering_unknown_state  = DataFilter(filter_by="FILTER_EQUAL_VALUE", by_value='unknown', col='state')
 
 # let's go
 print("**************************************************************")
 print("Iniciating Pre-Processing on H1BdataDB\n")
 
 h1bdata_pre_preprocessors = [ 
-                     blank_lines_cleaner, comma_replacer, convert_salaries_to_float,filter_ds_jobs,\
-                    covert_date_to_datetime, get_out_outliers_IQR, \
-                    splitt_location_column, map_replace_states,filtering_unknown_state
+                     h1_bdata_blank_lines_cleaner, h1_bdata_comma_replacer, h1_bdata_convert_salaries_to_float,h1_bdata_filter_ds_jobs,\
+                    h1_bdata_covert_date_to_datetime, h1_bdata_get_out_outliers_IQR, \
+                    h1_bdata_splitt_location_column, map_replace_states,filtering_unknown_state
     ]
 
 preprocessing = PreProcessing( pre_processors= h1bdata_pre_preprocessors)
@@ -288,10 +288,18 @@ salaries_world_map_replace_company_size =  DataReplacer(task = "MAPREPLACING", o
 salaries_world_filter_less_freq = DataFilter(filter_by="FREQ_LOWER_THAN_VALUE", col='job_title', by_value= 4)
 
 
+
 #convert salaries to float
 
 salaries_world_convert_salaries_usd_float = DataTypeConversor(to_type="TO_FLOAT", col="salary_in_usd")
 salaries_world_convert_salaries_float = DataTypeConversor(to_type="TO_FLOAT", col="salary")
+
+
+
+
+
+
+
 #Salaries Around world prepropcessing
 print("**************************************************************")
 print("Iniciating Pre-Processing on salaries__around_worl\n")
