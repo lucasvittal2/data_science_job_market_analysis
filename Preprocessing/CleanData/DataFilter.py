@@ -1,5 +1,5 @@
 from AbstractionClasses.Preprocessing.DataCleaner import DataCleaner
-from pandas import DataFrame
+from pandas import DataFrame, concat
 from scipy import stats
 import numpy as np
 
@@ -7,10 +7,11 @@ class DataFilter(DataCleaner):
     
     
     
-    def __init__(self, filter_by: str, col: str, by_value=None):
+    def __init__(self, filter_by: str, col: str, category_col:str = "", by_value=None):
         self.by_value = by_value
         self.col = col
         self.filter_by = filter_by
+        self.category_col = category_col
     
     
     def __filter_data_by_z_score(self, data: DataFrame):
@@ -33,6 +34,7 @@ class DataFilter(DataCleaner):
         #filter by IRQ
         
         tmp_df = data.copy()
+        col= self.col
         
         Q1 = tmp_df.quantile(0.25)
         Q3 = tmp_df.quantile(0.75)
@@ -46,16 +48,31 @@ class DataFilter(DataCleaner):
     
     def __eliminate_outliers(self, data: DataFrame):
         
-        if self.filter_by == "FILTER_OUTLIERS_BY_Z_SCORE":
+        if self.filter_by == "FILTER_OUTLIERS_BY_Z_SCORE" or self.filter_by == "FILTER_OUTLIERS_CATEGORICALLY_Z_SCORE":
             filtered_data = self.__filter_data_by_z_score(data)
-        elif self.filter_by == "FILTER_OUTLIERS_BY_IQR":
+            
+        elif self.filter_by == "FILTER_OUTLIERS_BY_IQR"  or self.filter_by == "FILTER_OUTLIERS_CATEGORICALLY_BY_IRQ":
             filtered_data = self.__filter_data_by_IQR(data)
         else:
             print("You have tryed to implent a non-available outilier elimination method")
             raise NotImplementedError("Outrilier Elimination Methoid not available !\n  \
-                                       try to impleement one of following available methods : 'FILTER_OUTLIERS_BY_Z_SCORE' or 'FILTER_OUTLIERS_BY_IQR' ")
+                                       try to impleement one of following available methods : 'FILTER_OUTLIERS_BY_Z_SCORE' ,'FILTER_OUTLIERS_BY_IQR', 'FILTER_OUTLIERS_CATEGORICALLY_BY_IRQ' or 'FILTER_OUTLIERS_CATEGORICALLY_Z_SCORE'")
         return filtered_data
          
+    def __eliminate_outliers_categorically(self, data: DataFrame):
+        
+        category_col = self.category_col
+        filtered_df = DataFrame({}, columns = data.columns)
+
+        for category in  data[category_col].unique():
+            
+            tmp_df =  data[  data[category_col] == category ] 
+            tmp_df = self.__eliminate_outliers(tmp_df)
+            filtered_df = concat([filtered_df, tmp_df], axis=0)
+            
+        
+        return filtered_df
+
          
     def __filter_by_freq(self, data:  DataFrame):
         
@@ -109,6 +126,7 @@ class DataFilter(DataCleaner):
             
         elif self.filter_by == "FILTER_LOWER_OR_EQUAL_THAN_VALUE":
             filtered_data =  tmp_data[ tmp_data[col] >=  value ]
+            
         else:
             print("ERROR NOT IMPLEMENTED!")
             raise NotImplementedError("Value Filtration Method not implemented!\n \
@@ -119,7 +137,11 @@ class DataFilter(DataCleaner):
     def clean_data(self, data):
         
         print("Performing Data Filtering... ")
-        if "FILTER_OUTLIERS" in self.filter_by:
+        
+        if "FILTER_OUTLIERS_CATEGORICALLY" in self.filter_by:
+            filtered_data = self.__eliminate_outliers_categorically(data)
+        
+        elif "FILTER_OUTLIERS" in self.filter_by:
             filtered_data = self.__eliminate_outliers(data)
             
         elif "FREQ" in self.filter_by:

@@ -31,7 +31,10 @@ class DataReplacer(DataTransformation):
         tmp_df[on_col] =  tmp_df[on_col].str.strip()
         tmp_df[on_col] =  tmp_df[on_col].str.upper()
         
+        
+        
         tmp_df[on_col] =  tmp_df[on_col].replace(map)
+        
     
         return tmp_df
     def __replace_char(self, data: DataFrame):
