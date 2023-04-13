@@ -22,7 +22,7 @@ class DataReplacer(DataTransformation):
         
         on_col = self.on_col
         map = self.map
-        
+        map = {str(k).upper(): str(v).upper() for k,v in  map.items()}
         
         #Replace data on column
         tmp_df = data.copy()

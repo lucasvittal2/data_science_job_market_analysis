@@ -26,7 +26,8 @@ class DataTypeConversor(DataTransformation):
         
         if to_type=="TO_DATETIME":
             
-            tmp_df[col] = to_datetime( tmp_df[col], format= actual_date_format).dt.strftime(to_date_format)
+            tmp_df[col] = to_datetime( tmp_df[col], format= actual_date_format)
+            tmp_df['date_str'] =  tmp_df[col].dt.strftime(to_date_format)
         
         elif to_type == "TO_FLOAT":
             tmp_df[col] = tmp_df[col].astype(np.float64)
