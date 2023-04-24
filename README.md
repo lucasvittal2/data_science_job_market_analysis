@@ -1,7 +1,7 @@
 # Data science job market analysis
 
 
-## Objetivo
+## Goals
 
 This work aims to obtain insights through the data of how the Data Science market is doing and what it is requiring. The a priori idea was to obtain insights about wages and skills demanded around the world. With this preliminary aim, data was collected from the most diverse sources, such as kaagle, glassdoor, h1bdata and medley. The links from which the datasets were downloaded can be found below and categorized according to a preliminary inspection:
 
