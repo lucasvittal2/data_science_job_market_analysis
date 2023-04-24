@@ -7,4 +7,4 @@ MY_COLORS = ['green','red','blue','purple','magenta','lime','cyan']
 JOB_COLORS  = ['blue', 'orange','green','red','purple','brown', 'magenta']
 
 #EXPIRIENCE_LEVEL_PALLETE = ['#c6fbc0','#9783aa','#7b58a1','#393f8c']
-EXPIRIENCE_LEVEL_PALLETE = ["#081d58", "#253494", "##225ea8", "#1d91c0"]
+EXPIRIENCE_LEVEL_PALLETE = ["#1d91c0","#225ea8", "#253494","#253494","#081d58"]
